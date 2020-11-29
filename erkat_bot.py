@@ -1,12 +1,16 @@
-from telegram.ext import Updater
 import logging
-from telegram.ext import CommandHandler, MessageHandler, Filters
+import configparser
+
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from profanity_filter import ProfanityFilter
-import pymorphy2
+
+config = configparser.ConfigParser()
+config.read('bot_config.ini')
 
 pf = ProfanityFilter(languages=['ru', 'en'])
 
-updater = Updater(token='', use_context=True)
+token = config['DEFAULT']['BotToken']
+updater = Updater(token=token, use_context=True)
 
 dispatcher = updater.dispatcher
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
