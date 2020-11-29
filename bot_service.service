@@ -1,0 +1,13 @@
+[Unit]
+Description=Bot Service
+After=multi-user.target
+Conflicts=getty@tty1.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/thegreatestbot
+ExecStart=/usr/bin/python3.8 /root/thegreatestbot/erkat_bot.py
+
+[Install]
+WantedBy=multi-user.target
