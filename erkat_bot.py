@@ -1,8 +1,12 @@
 import logging
 import configparser
+import sys
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from profanity_filter import ProfanityFilter
+from forex_python.converter import CurrencyRates
+from forex_python.bitcoin import BtcConverter
 
 config = configparser.ConfigParser()
 config.read('bot_config.ini')
@@ -20,7 +24,30 @@ def censor(update, context):
     if not pf.is_clean(update.message.text):
         context.bot.send_message(chat_id=update.effective_chat.id, text='Аккуратнее с языком молодой человек!')
 
-censor_handler = MessageHandler(Filters.text & (~Filters.command), censor)
-dispatcher.add_handler(censor_handler)
+currency_exchange = CurrencyRates()
 
-updater.start_polling()
+def usd_to_rub(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(round(currency_exchange.get_rates('USD')['RUB'], 2))
+
+def eur_to_rub(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(round(currency_exchange.get_rates('EUR')['RUB'], 2))
+    
+btc_exchange = BtcConverter()
+def btc_to_usd(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(round(btc_exchange.get_latest_price('USD'), 2))
+
+def main():
+    """Run bot."""
+    censor_handler = MessageHandler(Filters.text & (~Filters.command), censor)
+
+    dispatcher.add_handler(CommandHandler("usd2rub", usd_to_rub))
+    dispatcher.add_handler(CommandHandler("eur2rub", eur_to_rub))
+    dispatcher.add_handler(CommandHandler("btc2usd", btc_to_usd))
+    dispatcher.add_handler(censor_handler)
+
+    updater.start_polling()
+    updater.idle()
+
+
+if __name__ == '__main__':
+    main()

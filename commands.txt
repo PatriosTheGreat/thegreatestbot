@@ -1,0 +1,3 @@
+usd2rub - get usd to rub rate
+eur2rub - get eur to rub rate
+btc2usd - get btc to usd rate
