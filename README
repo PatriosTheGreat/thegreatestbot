@@ -1,0 +1,8 @@
+Run on ubuntu machine:
+nano /lib/systemd/system/bot_service.service
+
+systemctl daemon-reload
+systemctl enable bot_service.service
+systemctl start bot_service.service
+
+systemctl status bot_service.service
