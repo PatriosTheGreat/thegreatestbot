@@ -1,20 +1,19 @@
-# coding=UTF-8
-import logging
 import configparser
+import logging
 import sys
 import json
 import os.path
 
+from forex_python.bitcoin import BtcConverter
+from forex_python.converter import CurrencyRates
+from profanity_filter import ProfanityFilter
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
-from profanity_filter import ProfanityFilter
-from forex_python.converter import CurrencyRates
-from forex_python.bitcoin import BtcConverter
 
 config = configparser.ConfigParser()
 config.read('bot_config.ini')
 
-pf = ProfanityFilter(languages=['ru', 'en'])
+pf = ProfanityFilter(languages=['ru', 'en_core_web_sm'])
 
 token = config['DEFAULT']['BotToken']
 updater = Updater(token=token, use_context=True)

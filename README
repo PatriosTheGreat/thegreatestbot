@@ -1,3 +1,9 @@
+To install Poetry on your machine:
+pip install poetry
+
+To install dependencies for the project:
+poetry install
+
 Run on ubuntu machine:
 nano /lib/systemd/system/bot_service.service
 
