@@ -6,8 +6,8 @@ Conflicts=getty@tty1.service
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/root/thegreatestbot
-ExecStart=/usr/bin/python3.8 /root/thegreatestbot/erkat_bot.py
+WorkingDirectory=/home/patrios/Projects/thegreatestbot
+ExecStart=/usr/bin/python /home/patrios/Projects/thegreatestbot/erkat_bot.py
 
 [Install]
 WantedBy=multi-user.target

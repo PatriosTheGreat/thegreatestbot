@@ -3,9 +3,10 @@ import logging
 import sys
 import json
 import os.path
+import requests
+import datetime
 
 from forex_python.bitcoin import BtcConverter
-from forex_python.converter import CurrencyRates
 from profanity_filter import ProfanityFilter
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
@@ -49,15 +50,37 @@ class ChatMemberCensorRepository:
     def load_data(self):
         if os.path.isfile(self.repository_file):
             with open(self.repository_file, 'r') as f:
-                self.censored_users = set(json.loads(f.read()))
+                censored = json.loads(f.read())
+                for user_to_chat in censored:
+                    self.censored_users.add((user_to_chat[0], user_to_chat[1]))
 
-currency_exchange = CurrencyRates()
+class RateRepository:
+    data = []
+    last_day = datetime.date.min
+
+    def update_data_if_needed(self):
+        today = datetime.date.today()
+        if (today - self.last_day).days > 0:
+            self.last_day = today
+            self.data = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
+
+    def get_usd_to_rub(self):
+        self.update_data_if_needed()
+        return self.data['Valute']['USD']['Value']
+
+    def get_eur_to_rub(self):
+        self.update_data_if_needed()
+        return self.data['Valute']['EUR']['Value']
+
+
+rate_rapository = RateRepository()
+
 
 def usd_to_rub(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(round(currency_exchange.get_rates('USD')['RUB'], 2))
+    update.message.reply_text(round(rate_rapository.get_usd_to_rub(), 2))
 
 def eur_to_rub(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(round(currency_exchange.get_rates('EUR')['RUB'], 2))
+    update.message.reply_text(round(rate_rapository.get_eur_to_rub(), 2))
     
 btc_exchange = BtcConverter()
 def btc_to_usd(update: Update, context: CallbackContext) -> None:
